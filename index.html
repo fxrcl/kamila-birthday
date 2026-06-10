@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Для Камилы 👑</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav id="nav">
+  <button data-tab="sky" class="active">✨ Небо</button>
+  <button data-tab="reasons">💛 17 причин</button>
+  <button data-tab="heart">🤍 Сердце</button>
+  <button data-tab="letter">💌 Письмо</button>
+  <button data-tab="balloons">🫧 Шарики</button>
+  <button data-tab="quiz">🎮 Квиз</button>
+  <button data-tab="download">🎁 Скачать</button>
+</nav>
+
+<main id="stage">
+
+  <section id="tab-sky" class="tab show">
+    <canvas id="sky-canvas"></canvas>
+    <div class="sky-text">
+      <h1>Небо в ночь, когда ты родилась, Принцесса ✨</h1>
+      <p>22 июня 2009</p>
+    </div>
+    <div class="sky-hint">НАВЕДИ НА СОЗВЕЗДИЕ 🌙</div>
+    <div class="const-card" id="constCard"></div>
+  </section>
+
+  <section id="tab-reasons" class="tab">
+    <div class="sec-head">
+      <h2>17 причин,<br>почему ты особенная</h2>
+      <span>по одной на каждый твой год 👑</span>
+    </div>
+    <div id="reasons-list"></div>
+  </section>
+
+  <section id="tab-heart" class="tab">
+    <canvas id="heart-canvas"></canvas>
+    <p class="heart-msg">Ты занимаешь всё место здесь, Принцесса</p>
+  </section>
+
+  <section id="tab-letter" class="tab">
+    <div class="center">
+      <svg class="envelope" viewBox="0 0 210 145">
+        <rect x="5" y="22" width="200" height="118" rx="12" fill="#FFE5D9" stroke="#F8BBD9" stroke-width="2.5"/>
+        <path d="M5,30 L105,92 L205,30" fill="none" stroke="#F8BBD9" stroke-width="2.5"/>
+        <path d="M5,32 L105,86 L205,32 L205,24 Q205,19 199,19 L11,19 Q5,19 5,24 Z" fill="#FFF0F3" stroke="#F8BBD9" stroke-width="2.5"/>
+        <text x="105" y="118" text-anchor="middle" font-size="26">💌</text>
+      </svg>
+      <p class="letter-msg">Это письмо я вручу тебе лично, Принцесса. Некоторые слова важнее произносить вслух.</p>
+    </div>
+  </section>
+
+  <section id="tab-balloons" class="tab">
+    <div class="sec-head balloons-head">
+      <h2>Лопни шарик 🫧</h2>
+      <span>внутри каждого — что-то для тебя</span>
+    </div>
+    <div id="balloons-area"></div>
+    <div class="compliment" id="compliment"></div>
+  </section>
+
+  <section id="tab-quiz" class="tab">
+    <div class="center">
+      <h2 class="quiz-title">Как хорошо ты знаешь<br>своего парня? 👑</h2>
+      <div class="deck" id="deck"></div>
+      <div class="dots" id="dots"></div>
+      <div class="qnav">
+        <button id="qPrev">←</button>
+        <button id="qNext">→</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-download" class="tab">
+    <div class="center">
+      <h2>Подарок внутри 🎁</h2>
+      <p class="dl-sub">Специально для тебя, Принцесса — с любовью</p>
+      <a href="#" id="download-btn">Скачать приложение</a>
+    </div>
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

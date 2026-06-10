@@ -1,0 +1,140 @@
+:root{
+  --pink:#FFF0F3;--peach:#FFE5D9;--lav:#EDE7F6;
+  --accent:#F8BBD9;--accent2:#F48FB1;--bg:#FFF7F4;
+  --ink:#4a3a42;--soft:#a4929a;--night:#0D1B2A;--dark:#0a0a0f;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:'Manrope',sans-serif;font-weight:600;background:var(--bg);color:var(--ink);overflow-x:hidden}
+h1,h2,h3,.dp{font-family:'Unbounded',sans-serif}
+
+/* NAV — floating pill buttons */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:center;
+  gap:.55rem;flex-wrap:wrap;padding:1rem}
+nav button{font-family:'Manrope',sans-serif;font-size:.82rem;font-weight:800;color:var(--ink);
+  background:#fff;border:1.5px solid var(--accent);cursor:pointer;
+  padding:.6rem 1.15rem;border-radius:24px;transition:.25s;white-space:nowrap;
+  box-shadow:0 4px 14px rgba(0,0,0,.18)}
+nav button:hover{transform:translateY(-2px);box-shadow:0 7px 20px rgba(0,0,0,.25)}
+nav button.active{background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;border-color:transparent;box-shadow:0 7px 22px rgba(244,143,177,.55)}
+
+/* STAGE — fills viewport; tabs are absolute overlays so hidden ones leave no gaps */
+#stage{position:relative;width:100%;min-height:100vh}
+.tab{position:absolute;inset:0;width:100%;min-height:100vh;display:none;
+  overflow-y:auto;animation:fade .5s ease}
+.tab.show{display:block}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.center{max-width:780px;margin:0 auto;text-align:center;padding:7rem 1.2rem 4rem;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* light scrolling tabs */
+#tab-reasons{padding:7rem 1.2rem 4rem}
+#tab-balloons{padding:0}
+
+/* SKY */
+#tab-sky{background:var(--night)}
+#sky-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.sky-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;color:#fff;padding:0 1.5rem;pointer-events:none;z-index:3;width:100%}
+.sky-text h1{font-size:clamp(1.6rem,5vw,3rem);font-weight:800;line-height:1.25;
+  text-shadow:0 2px 40px rgba(0,0,0,.7);margin-bottom:.8rem;max-width:14ch;margin-inline:auto}
+.sky-text p{font-size:.8rem;letter-spacing:4px;opacity:.65;text-transform:uppercase;font-weight:700}
+.const-card{position:fixed;z-index:50;background:rgba(13,27,42,.94);
+  border:1px solid rgba(248,187,217,.35);border-radius:16px;padding:1rem 1.2rem;
+  max-width:240px;color:#fff;font-size:.82rem;line-height:1.55;pointer-events:none;
+  opacity:0;transition:.2s;font-weight:600}
+.const-card.show{opacity:1}
+.const-card b{font-family:'Unbounded',sans-serif;font-size:.95rem;display:block;margin-bottom:.4rem;color:var(--accent)}
+.sky-hint{position:absolute;bottom:1.6rem;left:0;right:0;text-align:center;z-index:3;
+  color:rgba(255,255,255,.4);font-size:.72rem;letter-spacing:2px;font-weight:700;pointer-events:none}
+
+/* REASONS */
+.sec-head{text-align:center;margin-bottom:3rem}
+.sec-head h2{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:800;color:var(--ink);line-height:1.2}
+.sec-head span{color:var(--soft);font-size:.92rem;font-weight:700;display:block;margin-top:.6rem}
+.reason{max-width:580px;margin:1.2rem auto;background:#fff;border-radius:22px;
+  padding:1.7rem 1.9rem;box-shadow:0 10px 34px rgba(248,187,217,.16);
+  display:flex;align-items:center;gap:1.5rem;opacity:0;transform:translateY(34px);
+  border:1px solid rgba(248,187,217,.18)}
+.reason.in{opacity:1;transform:none;transition:.7s cubic-bezier(.2,.7,.3,1)}
+.reason:nth-child(even){flex-direction:row-reverse;text-align:right}
+.reason .num{font-family:'Unbounded',sans-serif;font-size:2.6rem;font-weight:800;
+  color:transparent;background:linear-gradient(135deg,var(--accent2),#d96fa0);
+  -webkit-background-clip:text;background-clip:text;line-height:1;flex-shrink:0}
+.reason p{font-size:1.05rem;line-height:1.5;font-weight:600}
+
+/* HEART — wireframe mesh, canvas fills the tab */
+#tab-heart{background:var(--dark)}
+#heart-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.heart-msg{position:absolute;bottom:8%;left:50%;transform:translateX(-50%);
+  font-family:'Unbounded',sans-serif;font-weight:700;
+  font-size:clamp(1.1rem,3.2vw,1.7rem);color:#fff;text-align:center;padding:0 1.5rem;
+  text-shadow:0 0 30px rgba(255,45,85,.5);max-width:18ch;z-index:3;width:100%}
+
+/* LETTER */
+.envelope{margin:0 auto 2rem;width:210px;animation:floatslow 4s ease-in-out infinite}
+@keyframes floatslow{0%,100%{transform:translateY(0)}50%{transform:translateY(-13px)}}
+.letter-msg{font-family:'Unbounded',sans-serif;font-weight:500;font-size:clamp(1.05rem,2.8vw,1.5rem);
+  line-height:1.6;color:var(--ink);max-width:22ch;margin-inline:auto}
+
+/* BALLOONS */
+#tab-balloons{overflow:hidden}
+.balloons-head{position:relative;z-index:2;padding-top:7rem}
+.balloon{position:absolute;cursor:pointer;transition:transform .15s;animation:bfloat ease-in-out infinite}
+.balloon:hover{transform:scale(1.08)}
+.balloon.pop{animation:pop .4s forwards}
+@keyframes pop{to{transform:scale(1.6);opacity:0}}
+@keyframes bfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-32px)}}
+.compliment{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);
+  background:#fff;padding:1.7rem 2.1rem;border-radius:22px;box-shadow:0 24px 70px rgba(248,143,177,.4);
+  font-size:1.25rem;font-weight:700;text-align:center;max-width:320px;z-index:50;opacity:0;
+  pointer-events:none;transition:.4s;border:1px solid rgba(248,187,217,.3)}
+.compliment.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+/* QUIZ — swipe deck */
+#tab-quiz .center{max-width:520px}
+.quiz-title{font-size:clamp(1.4rem,4.2vw,2.1rem);font-weight:800;margin-bottom:1.8rem;color:var(--ink);line-height:1.25}
+.deck{position:relative;height:480px;width:100%;max-width:340px;margin:0 auto;touch-action:pan-y}
+.qcard{position:absolute;inset:0;border-radius:30px;padding:2.4rem 2rem 3rem;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  box-shadow:0 24px 60px rgba(0,0,0,.16);cursor:grab;user-select:none;
+  background:radial-gradient(circle at 50% 42%,#FF9EB6 0%,#FFB8C8 38%,#FFD9DE 70%,#FFF0F2 100%);
+  transition:transform .45s cubic-bezier(.2,.7,.3,1),opacity .45s}
+.qcard:active{cursor:grabbing}
+.qcard .qtext{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(1.25rem,5vw,1.7rem);
+  line-height:1.35;color:#3a2730;text-align:center}
+.qcard .qopts{display:flex;flex-direction:column;gap:.6rem;margin-top:1.6rem;width:100%}
+.qcard .qopts span{background:rgba(255,255,255,.6);padding:.7rem 1rem;border-radius:14px;
+  font-weight:800;font-size:1rem;color:#3a2730;backdrop-filter:blur(4px)}
+.qcard .brand{position:absolute;bottom:1.3rem;font-family:'Unbounded',sans-serif;font-weight:600;
+  font-size:.8rem;color:rgba(58,39,48,.55)}
+.qcard.gone-l{transform:translateX(-140%) rotate(-12deg);opacity:0}
+.qcard.gone-r{transform:translateX(140%) rotate(12deg);opacity:0}
+.qcard.final{background:radial-gradient(circle at 50% 42%,#F8BBD9 0%,#F4A9C4 45%,#FBE3EC 100%)}
+.qcard.final .qtext{font-weight:800}
+.dots{display:flex;gap:.4rem;justify-content:center;margin-top:1.6rem}
+.dots i{width:8px;height:8px;border-radius:50%;background:rgba(244,143,177,.3);transition:.3s}
+.dots i.on{background:var(--accent2);transform:scale(1.3)}
+.qnav{display:flex;align-items:center;justify-content:center;gap:1.4rem;margin-top:1.2rem}
+.qnav button{background:#fff;color:var(--accent2);border:1px solid rgba(248,187,217,.5);
+  width:50px;height:50px;border-radius:50%;font-size:1.2rem;font-weight:800;cursor:pointer;
+  transition:.25s;box-shadow:0 6px 16px rgba(248,187,217,.3)}
+.qnav button:hover{background:var(--accent2);color:#fff;transform:scale(1.08)}
+.qnav button:disabled{opacity:.3;cursor:default;transform:none}
+
+/* DOWNLOAD */
+#tab-download h2{font-size:clamp(2rem,6vw,3.2rem);font-weight:800;margin-bottom:1rem}
+.dl-sub{color:var(--soft);margin-bottom:2.6rem;font-size:1.1rem;font-weight:700}
+#download-btn{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:#fff;text-decoration:none;font-weight:800;font-size:1.15rem;padding:1.2rem 2.8rem;
+  border-radius:40px;box-shadow:0 14px 38px rgba(244,143,177,.45);transition:.3s;font-family:'Unbounded',sans-serif}
+#download-btn:hover{transform:translateY(-3px);box-shadow:0 20px 50px rgba(244,143,177,.55)}
+
+@media(max-width:600px){
+  nav button{font-size:.7rem;padding:.5rem .75rem}
+  .reason{padding:1.4rem;gap:1.1rem}
+  .reason .num{font-size:2.1rem}
+  .deck{height:440px}
+}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
