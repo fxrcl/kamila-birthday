@@ -12,6 +12,24 @@
 </head>
 <body>
 
+<!-- индикатор прогресса по вкладкам -->
+<div id="progress"><i></i></div>
+
+<!-- слой конфетти (поверх всего, клики проходят сквозь) -->
+<canvas id="confetti"></canvas>
+
+<!-- интро-приветствие при входе -->
+<div id="intro">
+  <div class="intro-inner">
+    <div class="intro-crown">👑</div>
+    <h1>С днём рождения,<br>Принцесса</h1>
+    <p>нажми, чтобы начать</p>
+  </div>
+</div>
+
+<!-- подсказка «листай вниз» -->
+<div class="scroll-cue" id="scrollCue">↓</div>
+
 <nav id="nav">
   <button data-tab="sky" class="active">✨ Небо</button>
   <button data-tab="reasons">💛 17 причин</button>
@@ -82,9 +100,10 @@
 
   <section id="tab-download" class="tab">
     <div class="center">
-      <h2>Подарок внутри 🎁</h2>
+      <div class="gift">🎁</div>
+      <h2>Подарок внутри</h2>
       <p class="dl-sub">Специально для тебя, Принцесса — с любовью</p>
-      <a href="#" id="download-btn">Скачать приложение</a>
+      <a href="#" id="download-btn"><span>Скачать приложение</span></a>
     </div>
   </section>
 

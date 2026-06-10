@@ -1,18 +1,86 @@
 'use strict';
 
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function buzz(ms) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+/* ========== CONFETTI ========== */
+const confCanvas = document.getElementById('confetti');
+const cctx = confCanvas.getContext('2d');
+let confParts = [], confRAF = null;
+const confColors = ['#F8BBD9', '#F48FB1', '#FFD6BA', '#D8C5F0', '#BFE6D4', '#FFC9DE', '#FFFFFF'];
+function confResize() { confCanvas.width = window.innerWidth; confCanvas.height = window.innerHeight; }
+function burstConfetti(count = 130, originY = 0.34) {
+  if (reduceMotion) return;
+  confResize();
+  const ox = window.innerWidth / 2, oy = window.innerHeight * originY;
+  for (let i = 0; i < count; i++) {
+    confParts.push({
+      x: ox + (Math.random() - .5) * 220, y: oy + (Math.random() - .5) * 60,
+      vx: (Math.random() - .5) * 11, vy: Math.random() * -13 - 4,
+      g: .28 + Math.random() * .12, r: Math.random() * 7 + 4,
+      rot: Math.random() * 6.28, vr: (Math.random() - .5) * .35,
+      col: confColors[i % confColors.length], life: 0, shape: Math.random() < .5 ? 0 : 1
+    });
+  }
+  if (!confRAF) confRAF = requestAnimationFrame(confTick);
+}
+function confTick() {
+  cctx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+  confParts.forEach(p => {
+    p.vy += p.g; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
+    cctx.save(); cctx.translate(p.x, p.y); cctx.rotate(p.rot);
+    cctx.globalAlpha = Math.max(0, 1 - p.life / 170); cctx.fillStyle = p.col;
+    if (p.shape === 0) cctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * .6);
+    else { cctx.beginPath(); cctx.arc(0, 0, p.r / 2, 0, 7); cctx.fill(); }
+    cctx.restore();
+  });
+  confParts = confParts.filter(p => p.y < confCanvas.height + 40 && p.life < 175);
+  if (confParts.length) confRAF = requestAnimationFrame(confTick);
+  else { cctx.clearRect(0, 0, confCanvas.width, confCanvas.height); confRAF = null; }
+}
+window.addEventListener('resize', confResize);
+
+/* ========== INTRO ========== */
+const intro = document.getElementById('intro');
+function dismissIntro() {
+  if (intro.classList.contains('hide')) return;
+  intro.classList.add('hide');
+  setTimeout(() => burstConfetti(150), 250);
+}
+intro.addEventListener('click', dismissIntro);
+setTimeout(dismissIntro, 6000);
+
 /* ========== NAV / TAB SWITCHING ========== */
 const navBtns = document.querySelectorAll('nav button');
 const tabs = document.querySelectorAll('.tab');
+const tabOrder = [...navBtns].map(b => b.dataset.tab);
+const progFill = document.querySelector('#progress i');
+const scrollCue = document.getElementById('scrollCue');
 
 function showTab(name) {
   navBtns.forEach(x => x.classList.toggle('active', x.dataset.tab === name));
   tabs.forEach(t => t.classList.toggle('show', t.id === 'tab-' + name));
   window.scrollTo(0, 0);
+  const idx = tabOrder.indexOf(name);
+  progFill.style.width = (idx / (tabOrder.length - 1)) * 100 + '%';
+  updateScrollCue(name);
   if (name === 'reasons') revealReasons();
   if (name === 'heart') startHeart();
   if (name === 'sky') skyActive = true; else skyActive = false;
 }
 navBtns.forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+progFill.style.width = '0%';
+
+/* подсказка «листай вниз» — показывается на вкладках, где есть что прокрутить */
+function updateScrollCue(name) {
+  const tab = document.getElementById('tab-' + name);
+  const scrollable = tab && tab.scrollHeight > tab.clientHeight + 24;
+  scrollCue.classList.toggle('show', !!scrollable && tab.scrollTop < 20);
+}
+tabs.forEach(t => t.addEventListener('scroll', () => {
+  scrollCue.classList.toggle('show', t.classList.contains('show') &&
+    t.scrollHeight > t.clientHeight + 24 && t.scrollTop < 20);
+}, { passive: true }));
 
 /* ========== STARRY SKY ========== */
 const skyCanvas = document.getElementById('sky-canvas');
@@ -73,6 +141,23 @@ skyCanvas.addEventListener('mousemove', e => {
   } else ccard.classList.remove('show');
 });
 skyCanvas.addEventListener('mouseleave', () => ccard.classList.remove('show'));
+
+/* тап по созвездию на телефоне — больший радиус попадания + автоскрытие */
+let ccardTimer;
+skyCanvas.addEventListener('click', e => {
+  const r = skyCanvas.getBoundingClientRect();
+  const mx = (e.clientX - r.left) / SW, my = (e.clientY - r.top) / SH;
+  let hit = null, best = .12;
+  constellations.forEach(c => { const d = Math.hypot(mx - c.cx, my - c.cy); if (d < best) { best = d; hit = c; } });
+  if (!hit) { ccard.classList.remove('show'); return; }
+  ccard.innerHTML = '<b>' + hit.name + '</b>' + hit.desc;
+  ccard.style.left = Math.min(Math.max(e.clientX - 120, 12), window.innerWidth - 252) + 'px';
+  ccard.style.top = Math.min(e.clientY + 16, window.innerHeight - 170) + 'px';
+  ccard.classList.add('show');
+  buzz(15);
+  clearTimeout(ccardTimer);
+  ccardTimer = setTimeout(() => ccard.classList.remove('show'), 3500);
+});
 window.addEventListener('resize', () => { skyResize(); if (heartStarted) buildHeart(); });
 skyResize();
 skyDraw();
@@ -97,11 +182,14 @@ const reasons = [
   "Ты делаешь мой мир ярче просто своим существованием",
   "Мы всегда рядом — и я не хочу иначе"
 ];
+// по «приколюхе»-стикеру на каждую карточку (подобраны под смысл + милые зверюшки)
+const reasonDecor = ['🌸','🐘','🐻','🩺','🦄','🌷','🕊️','💗','🏡','⭐','☀️','🦁','🐰','✨','👑','🌈','🐧'];
 const rlist = document.getElementById('reasons-list');
 reasons.forEach((r, i) => {
   const d = document.createElement('div');
   d.className = 'reason';
-  d.innerHTML = '<div class="num">' + (i + 1) + '</div><p>' + r + '</p>';
+  d.innerHTML = '<span class="reason-emoji">' + (reasonDecor[i] || '🌸') + '</span>' +
+    '<div class="num">' + (i + 1) + '</div><p>' + r + '</p>';
   rlist.appendChild(d);
 });
 function revealReasons() {
@@ -205,6 +293,7 @@ compliments.forEach((txt, i) => {
   b.addEventListener('click', () => {
     if (b.classList.contains('pop')) return;
     b.classList.add('pop');
+    buzz(30);
     compEl.textContent = txt;
     compEl.classList.add('show');
     clearTimeout(compTimer);
@@ -230,7 +319,7 @@ const questions = [
 ];
 const deck = document.getElementById('deck');
 const dotsEl = document.getElementById('dots');
-let qi = 0;
+let qi = 0, finalFired = false;
 
 function buildDeck() {
   deck.innerHTML = '';
@@ -257,6 +346,8 @@ function update() {
   [...dotsEl.children].forEach((d, i) => d.classList.toggle('on', i === Math.min(qi, questions.length - 2)));
   document.getElementById('qPrev').disabled = qi === 0;
   document.getElementById('qNext').disabled = qi >= questions.length - 1;
+  // долистали до финальной карточки — праздничный салют (один раз)
+  if (qi === questions.length - 1 && !finalFired) { finalFired = true; burstConfetti(120, 0.4); }
 }
 function nextCard() { if (qi < questions.length - 1) { qi++; update(); } }
 function prevCard() { if (qi > 0) { qi--; update(); } }
@@ -275,6 +366,7 @@ function addSwipe(card, idx) {
     if (dx < -80) nextCard();
     else if (dx > 80) prevCard();
     if (qi === before) card.style.transform = '';  // карточка не сменилась — вернуть на место
+    else buzz(12);
     dx = 0;
   };
   card.addEventListener('mousedown', e => down(e.clientX));

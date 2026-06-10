@@ -8,6 +8,20 @@ html,body{height:100%}
 body{font-family:'Manrope',sans-serif;font-weight:600;background:var(--bg);color:var(--ink);overflow-x:hidden}
 h1,h2,h3,.dp{font-family:'Unbounded',sans-serif}
 
+/* живой пастельный фон — мягкие размытые пятна, медленно дышат.
+   Светлые вкладки прозрачны и показывают его, тёмные (Небо/Сердце) перекрывают своим фоном. */
+body::before{content:"";position:fixed;inset:-10%;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(38vmax 38vmax at 15% 18%,rgba(248,187,217,.40),transparent 60%),
+    radial-gradient(34vmax 34vmax at 85% 28%,rgba(216,197,240,.34),transparent 62%),
+    radial-gradient(40vmax 40vmax at 72% 88%,rgba(255,214,186,.36),transparent 62%),
+    radial-gradient(30vmax 30vmax at 25% 80%,rgba(191,230,212,.30),transparent 62%);
+  animation:blobs 22s ease-in-out infinite}
+@keyframes blobs{
+  0%,100%{transform:translate(0,0) scale(1)}
+  33%{transform:translate(3%,-2%) scale(1.06)}
+  66%{transform:translate(-2%,3%) scale(1.03)}}
+
 /* NAV — floating pill buttons */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:center;
   gap:.55rem;flex-wrap:wrap;padding:1rem}
@@ -36,9 +50,11 @@ nav button.active{color:#fff;border-color:transparent;
 
 /* STAGE — fills viewport; tabs are absolute overlays so hidden ones leave no gaps */
 #stage{position:relative;width:100%;min-height:100vh}
-.tab{position:absolute;inset:0;width:100%;min-height:100vh;display:none;
-  overflow-y:auto;animation:fade .5s ease}
-.tab.show{display:block}
+.tab{position:absolute;inset:0;width:100%;min-height:100vh;display:none;overflow-y:auto}
+.tab.show{display:block;animation:tabIn .55s cubic-bezier(.2,.7,.3,1)}
+@keyframes tabIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+/* тёмные вкладки выезжают мягче, без вертикального сдвига (чтобы canvas не мигал) */
+#tab-sky.show,#tab-heart.show{animation:fade .6s ease}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 .center{max-width:780px;margin:0 auto;text-align:center;padding:7rem 1.2rem 4rem;
   min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
@@ -68,15 +84,30 @@ nav button.active{color:#fff;border-color:transparent;
 .sec-head{text-align:center;margin-bottom:3rem}
 .sec-head h2{font-size:clamp(1.8rem,5.5vw,3rem);font-weight:800;color:var(--ink);line-height:1.2}
 .sec-head span{color:var(--soft);font-size:.92rem;font-weight:700;display:block;margin-top:.6rem}
-.reason{max-width:580px;margin:1.2rem auto;background:#fff;border-radius:22px;
+.reason{position:relative;max-width:580px;margin:1.2rem auto;background:#fff;border-radius:22px;
   padding:1.7rem 1.9rem;box-shadow:0 10px 34px rgba(248,187,217,.16);
   display:flex;align-items:center;gap:1.5rem;opacity:0;transform:translateY(34px);
   border:1px solid rgba(248,187,217,.18)}
-.reason.in{opacity:1;transform:none;transition:.7s cubic-bezier(.2,.7,.3,1)}
-.reason:nth-child(even){flex-direction:row-reverse;text-align:right}
+/* стикер-«приколюха» в верхнем углу карточки, слегка выглядывает за край */
+.reason-emoji{position:absolute;top:-16px;font-size:2.2rem;line-height:1;z-index:2;
+  filter:drop-shadow(0 5px 9px rgba(248,143,177,.45));pointer-events:none;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  animation:emojiFloat 3.6s ease-in-out infinite}
+.reason:nth-child(odd) .reason-emoji{left:18px}
+.reason:nth-child(even) .reason-emoji{right:18px}
+.reason.in:hover .reason-emoji{animation:none;transform:rotate(10deg) scale(1.3)}
+@keyframes emojiFloat{
+  0%,100%{transform:translateY(0) rotate(-11deg)}
+  50%{transform:translateY(-7px) rotate(-4deg)}}
+.reason.in{opacity:1;transform:none;transition:opacity .7s cubic-bezier(.2,.7,.3,1),transform .35s ease,box-shadow .35s ease,border-color .35s ease}
+.reason:nth-child(odd){background:linear-gradient(135deg,#fff,#fff5f9)}
+.reason:nth-child(even){flex-direction:row-reverse;text-align:right;background:linear-gradient(135deg,#fff,#faf6ff)}
+.reason.in:hover{transform:translateY(-5px);box-shadow:0 20px 46px rgba(248,143,177,.30);border-color:rgba(248,187,217,.5)}
+.reason.in:hover .num{transform:scale(1.12)}
 .reason .num{font-family:'Unbounded',sans-serif;font-size:2.6rem;font-weight:800;
   color:transparent;background:linear-gradient(135deg,var(--accent2),#d96fa0);
-  -webkit-background-clip:text;background-clip:text;line-height:1;flex-shrink:0}
+  -webkit-background-clip:text;background-clip:text;line-height:1;flex-shrink:0;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
 .reason p{font-size:1.05rem;line-height:1.5;font-weight:600}
 
 /* HEART — wireframe mesh, canvas fills the tab */
@@ -139,12 +170,67 @@ nav button.active{color:#fff;border-color:transparent;
 .qnav button:disabled{opacity:.3;cursor:default;transform:none}
 
 /* DOWNLOAD */
+.gift{font-size:clamp(4rem,12vw,6rem);line-height:1;margin-bottom:1rem;
+  filter:drop-shadow(0 12px 22px rgba(244,143,177,.45));
+  animation:giftBob 2.6s ease-in-out infinite;transform-origin:50% 80%}
+@keyframes giftBob{
+  0%,100%{transform:translateY(0) rotate(-4deg)}
+  25%{transform:translateY(-6px) rotate(3deg)}
+  50%{transform:translateY(-12px) rotate(-2deg)}
+  75%{transform:translateY(-6px) rotate(4deg)}}
 #tab-download h2{font-size:clamp(2rem,6vw,3.2rem);font-weight:800;margin-bottom:1rem}
 .dl-sub{color:var(--soft);margin-bottom:2.6rem;font-size:1.1rem;font-weight:700}
-#download-btn{display:inline-block;background:linear-gradient(135deg,var(--accent),var(--accent2));
+#download-btn{position:relative;overflow:hidden;isolation:isolate;display:inline-block;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
   color:#fff;text-decoration:none;font-weight:800;font-size:1.15rem;padding:1.2rem 2.8rem;
-  border-radius:40px;box-shadow:0 14px 38px rgba(244,143,177,.45);transition:.3s;font-family:'Unbounded',sans-serif}
-#download-btn:hover{transform:translateY(-3px);box-shadow:0 20px 50px rgba(244,143,177,.55)}
+  border-radius:40px;font-family:'Unbounded',sans-serif;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;
+  animation:dlPulse 2.6s ease-in-out infinite}
+/* бегущий блик по кнопке */
+#download-btn::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.55) 50%,transparent 70%);
+  transform:translateX(-130%);animation:dlShine 3.4s ease-in-out infinite}
+@keyframes dlShine{0%,55%{transform:translateX(-130%)}80%,100%{transform:translateX(130%)}}
+@keyframes dlPulse{
+  0%,100%{box-shadow:0 14px 38px rgba(244,143,177,.45)}
+  50%{box-shadow:0 16px 50px rgba(244,143,177,.72),0 0 0 7px rgba(248,187,217,.20)}}
+#download-btn:hover{transform:translateY(-4px) scale(1.04)}
+
+/* PROGRESS BAR — тонкая линия по верху, заполняется по мере перехода вкладок */
+#progress{position:fixed;top:0;left:0;right:0;height:3px;z-index:200;
+  background:rgba(248,187,217,.18);pointer-events:none}
+#progress i{display:block;height:100%;width:0;border-radius:0 3px 3px 0;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  box-shadow:0 0 10px rgba(244,143,177,.8);transition:width .5s cubic-bezier(.2,.7,.3,1)}
+
+/* INTRO — приветственный оверлей */
+#intro{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;
+  text-align:center;color:#fff;cursor:pointer;
+  background:radial-gradient(circle at 50% 38%,#1c2c48 0%,var(--night) 70%);
+  transition:opacity .8s ease,visibility .8s}
+#intro.hide{opacity:0;visibility:hidden}
+.intro-inner{padding:2rem;animation:introUp 1s cubic-bezier(.2,.7,.3,1)}
+@keyframes introUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.intro-crown{font-size:clamp(4rem,14vw,6.5rem);line-height:1;
+  filter:drop-shadow(0 10px 26px rgba(248,187,217,.5));animation:crownFloat 3.4s ease-in-out infinite}
+@keyframes crownFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-16px) rotate(3deg)}}
+#intro h1{font-family:'Unbounded',sans-serif;font-weight:800;line-height:1.2;
+  font-size:clamp(2rem,7vw,3.6rem);margin:.8rem 0 1.2rem;text-shadow:0 4px 34px rgba(0,0,0,.55)}
+#intro p{letter-spacing:3px;text-transform:uppercase;font-size:.78rem;font-weight:700;
+  color:rgba(255,255,255,.6);animation:cueBlink 2s ease-in-out infinite}
+@keyframes cueBlink{0%,100%{opacity:.35}50%{opacity:.85}}
+
+/* CONFETTI — слой поверх всего */
+#confetti{position:fixed;inset:0;z-index:400;pointer-events:none}
+
+/* SCROLL CUE — подсказка «листай вниз» */
+.scroll-cue{position:fixed;bottom:1.3rem;left:50%;transform:translateX(-50%);z-index:40;
+  width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.85);color:var(--accent2);font-size:1.3rem;font-weight:800;
+  box-shadow:0 8px 22px rgba(248,143,177,.35);pointer-events:none;
+  opacity:0;visibility:hidden;transition:opacity .4s,visibility .4s;animation:cueBounce 1.6s ease-in-out infinite}
+.scroll-cue.show{opacity:.95;visibility:visible}
+@keyframes cueBounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
 
 @media(max-width:600px){
   nav button{font-size:.7rem;padding:.5rem .75rem}
