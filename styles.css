@@ -11,13 +11,28 @@ h1,h2,h3,.dp{font-family:'Unbounded',sans-serif}
 /* NAV — floating pill buttons */
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:center;
   gap:.55rem;flex-wrap:wrap;padding:1rem}
-nav button{font-family:'Manrope',sans-serif;font-size:.82rem;font-weight:800;color:var(--ink);
-  background:#fff;border:1.5px solid var(--accent);cursor:pointer;
-  padding:.6rem 1.15rem;border-radius:24px;transition:.25s;white-space:nowrap;
-  box-shadow:0 4px 14px rgba(0,0,0,.18)}
-nav button:hover{transform:translateY(-2px);box-shadow:0 7px 20px rgba(0,0,0,.25)}
-nav button.active{background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:#fff;border-color:transparent;box-shadow:0 7px 22px rgba(244,143,177,.55)}
+nav button{position:relative;overflow:hidden;isolation:isolate;
+  font-family:'Manrope',sans-serif;font-size:.82rem;font-weight:800;color:var(--ink);
+  background:linear-gradient(135deg,#fff 0%,#fff5f8 100%);
+  border:1.5px solid var(--accent);cursor:pointer;
+  padding:.6rem 1.2rem;border-radius:24px;white-space:nowrap;
+  box-shadow:0 4px 14px rgba(244,143,177,.22);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .25s,color .25s,border-color .25s}
+/* блик-проблеск, пробегающий по кнопке при наведении */
+nav button::before{content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.75) 50%,transparent 70%);
+  transform:translateX(-120%);transition:transform .55s ease}
+nav button:hover{transform:translateY(-3px) scale(1.04);
+  box-shadow:0 9px 22px rgba(244,143,177,.4)}
+nav button:hover::before{transform:translateX(120%)}
+nav button:active{transform:translateY(-1px) scale(.99)}
+nav button.active{color:#fff;border-color:transparent;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  box-shadow:0 8px 24px rgba(244,143,177,.6);
+  animation:navGlow 2.4s ease-in-out infinite}
+@keyframes navGlow{
+  0%,100%{box-shadow:0 8px 24px rgba(244,143,177,.55)}
+  50%{box-shadow:0 8px 30px rgba(244,143,177,.85),0 0 0 4px rgba(248,187,217,.25)}}
 
 /* STAGE — fills viewport; tabs are absolute overlays so hidden ones leave no gaps */
 #stage{position:relative;width:100%;min-height:100vh}
@@ -136,5 +151,31 @@ nav button.active{background:linear-gradient(135deg,var(--accent),var(--accent2)
   .reason{padding:1.4rem;gap:1.1rem}
   .reason .num{font-size:2.1rem}
   .deck{height:440px}
+}
+
+/* LANDSCAPE / низкий вьюпорт — перевёрнутый телефон, ближе к десктоп-виду.
+   При малой высоте контент перестаёт центрироваться (иначе верх обрезается)
+   и начинает нормально скроллиться; навигация и блоки становятся компактнее. */
+@media(max-height:560px){
+  nav{padding:.5rem;gap:.4rem}
+  nav button{font-size:.72rem;padding:.42rem .85rem}
+
+  /* центрируем по горизонтали, но прижимаем к верху — высокий контент скроллится целиком */
+  .center{justify-content:flex-start;padding:4.5rem 1.2rem 2.5rem;min-height:auto}
+  #tab-reasons{padding:4.5rem 1.2rem 2.5rem}
+  .balloons-head{padding-top:4.2rem}
+
+  .sec-head{margin-bottom:1.6rem}
+  .reason{margin:.8rem auto;padding:1.2rem 1.5rem}
+
+  /* квиз умещается по высоте */
+  .quiz-title{margin-bottom:1rem}
+  .deck{height:min(72vh,360px);max-width:300px}
+  .qcard{padding:1.6rem 1.6rem 2.4rem;border-radius:24px}
+  .dots{margin-top:1rem}
+  .qnav{margin-top:.8rem}
+  .qnav button{width:44px;height:44px}
+
+  .envelope{width:150px;margin-bottom:1.2rem}
 }
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important}}
