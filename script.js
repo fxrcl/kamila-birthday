@@ -245,7 +245,7 @@ function buildDeck() {
     c.innerHTML = '<div class="qtext">' + q.q.replace(/\n/g, '<br>') + '</div>' + opts + brand;
     deck.appendChild(c);
     if (!q.final) dotsEl.appendChild(document.createElement('i'));
-    addSwipe(c, i);
+    if (!q.final) addSwipe(c, i);   // финальную карточку нельзя свайпать
   });
   update();
 }
@@ -271,9 +271,10 @@ function addSwipe(card, idx) {
     if (!drag) return;
     drag = false;
     card.style.transition = '';
+    const before = qi;
     if (dx < -80) nextCard();
     else if (dx > 80) prevCard();
-    else card.style.transform = '';
+    if (qi === before) card.style.transform = '';  // карточка не сменилась — вернуть на место
     dx = 0;
   };
   card.addEventListener('mousedown', e => down(e.clientX));
